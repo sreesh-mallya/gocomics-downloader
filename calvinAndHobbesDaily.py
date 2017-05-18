@@ -10,11 +10,12 @@ import datetime
 user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0'
 headers = {'User-Agent': user_agent}
 
-base_url = 'http://www.gocomics.com/calvinandhobbes/'   # Can be modified to URL of any comic on www.gocomics.com
+comic = 'calvinandhobbes'
+base_url = 'http://www.gocomics.com/' + comic + '/'   # Can be modified to URL of any comic on www.gocomics.com
 
 today = datetime.datetime.now().strftime("%Y/%m/%d")
 
-filename = 'calvinandhobbes-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'   # Save downloaded file as <today's date>.gif
+filename = comic + '-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'
 
 req = Request(base_url+today, None, headers)
 
