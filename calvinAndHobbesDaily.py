@@ -23,6 +23,6 @@ req = Request(url, None, headers)
 with urlopen(req) as response:
     html = response.read()
 
-soup = BeautifulSoup(html, 'http.parser')
+soup = BeautifulSoup(html, 'html.parser')
 img_src = soup.find_all('picture', {'class': 'img-fluid item-comic-image'})[0].img['src']
 urlretrieve(img_src, filename)  # Save file with `filename`
