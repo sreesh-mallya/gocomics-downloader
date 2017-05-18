@@ -14,7 +14,7 @@ base_url = 'http://www.gocomics.com/calvinandhobbes/'   # Can be modified to URL
 
 today = datetime.datetime.now().strftime("%Y/%m/%d")
 
-filename = datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'   # Save downloaded file as <today's date>.gif
+filename = 'calvinandhobbes-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'   # Save downloaded file as <today's date>.gif
 
 req = Request(base_url+today, None, headers)
 
