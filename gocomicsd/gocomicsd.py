@@ -1,6 +1,7 @@
 import argparse
 import logging
 import datetime
+import os
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request, urlretrieve
@@ -24,7 +25,12 @@ def parse_args(cl_args):
     parser.add_argument('--list', type=str, help='View available comics.')
 
 
-def download(comic: str, date: str) -> None:
+def create_folders(path: str, folder_name: str) -> None:
+    # TODO: Create folders for saving downloads
+    pass
+
+
+def get_img_src(comic: str, date: str = None) -> None:
     url = BASE_URL + comic + '/' + date
     filename = comic + '-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'
     req = Request(url, None, HEADERS)
@@ -34,4 +40,10 @@ def download(comic: str, date: str) -> None:
 
     soup = BeautifulSoup(html, 'html.parser')
     img_src = soup.find_all('picture', {'class': 'item-comic-image'})[0].img['src']
-    urlretrieve(img_src, filename)  # Save file with `filename`
+
+    return img_src
+
+
+def main():
+    # TODO: Driver function
+    pass
