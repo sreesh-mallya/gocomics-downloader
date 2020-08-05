@@ -1,8 +1,8 @@
-import argparse
 import logging
 import datetime
 import os
 
+import click
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request, urlretrieve
 
@@ -15,14 +15,7 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10
 HEADERS = {'User-Agent': USER_AGENT}
 BASE_URL = r'http://www.gocomics.com/'
 
-
-def parse_args(cl_args):
-    parser = argparse.ArgumentParser(description='Download comic strips from GoComics.')
-    parser.add_argument('--path', type=str, help='Path to save downloaded files to.')
-    parser.add_argument('--from', type=str, help='Download comic strips from date DD-MM-YYYY.')
-    parser.add_argument('--to', type=str, help='Download comic strips from date DD-MM-YYYY.')
-    parser.add_argument('--name', type=str, help='Comic to download. Use `--list` to view available comics.')
-    parser.add_argument('--list', type=str, help='View available comics.')
+dt_now = datetime.datetime.now().strftime("%Y-%m-%d")
 
 
 def create_folders(path: str, folder_name: str) -> None:
@@ -32,7 +25,7 @@ def create_folders(path: str, folder_name: str) -> None:
 
 def get_img_src(comic: str, date: str = None) -> None:
     url = BASE_URL + comic + '/' + date
-    filename = comic + '-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'
+    # filename = comic + '-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'
     req = Request(url, None, HEADERS)
 
     with urlopen(req) as response:
@@ -44,6 +37,32 @@ def get_img_src(comic: str, date: str = None) -> None:
     return img_src
 
 
-def main():
-    # TODO: Driver function
+@click.group()
+def cli():
+    """Download comic strips from gocomics.com."""
     pass
+
+
+@cli.command()
+@click.option('--search', default=None, help='Search for a comic by name.')
+def list(search):
+    """List all available comics from gocomics.com."""
+
+    # TODO: List comics
+    if search is not None:
+        click.echo(search)
+    click.echo('hello')
+
+
+@cli.command()
+@click.option('--path', default=os.getcwd(), help='Download comic strips to path.')
+@click.option('--from-date', default=dt_now, help='Download comic strips from date.')
+@click.option('--to-date', default=dt_now, help='Download comic strips to date.')
+@click.argument('name', type=str, required=True)
+def save(path, from_date, to_date, name):
+    """Download comic strips by name. This automatically creates a folder by name
+    and subfolders by year and month. If options for from and to date are not passed,
+    this downloads today's comic."""
+
+    # TODO: Download gif
+    click.echo(name)
