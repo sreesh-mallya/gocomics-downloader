@@ -3,19 +3,35 @@ import os
 
 import typer
 from halo import Halo
+from rich.console import Console
+from rich.table import Table
 
 from gocomicsd.helpers import get_titles
 
+console = Console()
 dt_now = datetime.datetime.now().strftime("%Y-%m-%d")
 cli = typer.Typer(help="Download comic strips from gocomics.com.")
 
 
 @cli.command()
-@Halo(text='Getting titles from gocomics.com', spinner='dots')
 def titles(search: str = typer.Option(None, help='Search for comics by name.')):
     """List all available comics from gocomics.com."""
 
-    typer.echo(get_titles(search))
+    with Halo(text='Getting titles from gocomics.com', spinner='dots'):
+        titles_ = get_titles(search)
+
+    table = Table(show_header=True)
+    table.add_column('TITLE')
+    table.add_column('NAME', justify='right')
+
+    if search is not None:
+        console.print('Found {} search result(s) for `{}`.'.format(len(titles_), search))
+
+    if len(titles_) > 0:
+        for k, v in titles_.items():
+            table.add_row(v, '[yellow]{}[/yellow]'.format(k))
+        console.print(table)
+        console.print('Use [bold]gocomicsd save NAME[/bold] to download.')
 
 
 @cli.command()
