@@ -2,19 +2,20 @@ import datetime
 import os
 
 import typer
+from halo import Halo
+
+from gocomicsd.helpers import get_titles
 
 dt_now = datetime.datetime.now().strftime("%Y-%m-%d")
 cli = typer.Typer(help="Download comic strips from gocomics.com.")
 
 
 @cli.command()
-def list(search: str = typer.Option(None, help='Search for comics by name.')):
+@Halo(text='Getting titles from gocomics.com', spinner='dots')
+def titles(search: str = typer.Option(None, help='Search for comics by name.')):
     """List all available comics from gocomics.com."""
 
-    # TODO: List comics
-    if search is not None:
-        typer.echo(search)
-    typer.echo('hello')
+    typer.echo(get_titles(search))
 
 
 @cli.command()
