@@ -1,11 +1,20 @@
+import datetime
+import os
+from typing import Dict
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
 
 from gocomicsd.commons import BASE_URL, HEADERS, LIST_PATH
+from gocomicsd.exceptions import InvalidDateFormatError, InvalidPathException
 
 
-def get_titles(search: str = None):
+def get_titles(search: str = None) -> Dict[str, str]:
+    """
+    Return a dictionary with titles against names.
+    :param search: Filter titles containing search keyword.
+    :return:
+    """
     url = BASE_URL + LIST_PATH
     req = Request(url, None, HEADERS)
 
@@ -28,9 +37,34 @@ def get_titles(search: str = None):
     return titles
 
 
-def create_folders(path: str, folder_name: str):
-    # TODO: Create folders for saving downloads
-    pass
+def is_valid_date(date: str) -> bool:
+    try:
+        datetime.datetime.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        return False
+    return True
+
+
+def save_title(title: str, name: str, path: str, from_date: str, to_date: str):
+    """
+
+    :param title:
+    :param path:
+    :return:
+    """
+    if not is_valid_date(from_date) and not is_valid_date(to_date):
+        raise InvalidDateFormatError('Dates not in format YYYY-MM-DD!')
+
+    if not os.path.isdir(path):
+        raise InvalidPathException('`path` is not a directory or `path` does not exist.')
+
+    create_path = os.path.join(path, name)
+
+    try:
+        os.makedirs(create_path)
+    except OSError:
+        # TODO: Handle exception
+        return
 
 
 def get_img_src(comic: str, date: str = None):
