@@ -1,11 +1,20 @@
-from urllib.request import Request, urlopen
+import os
+from typing import Dict
+from urllib.error import ContentTooShortError
+from urllib.request import Request, urlopen, urlretrieve
 
 from bs4 import BeautifulSoup
 
 from gocomicsd.commons import BASE_URL, HEADERS, LIST_PATH
+from gocomicsd.exceptions import InvalidPathException
 
 
-def get_titles(search: str = None):
+def get_titles(search: str = None) -> Dict[str, str]:
+    """
+    Return a dictionary with titles against names.
+    :param search: Filter titles containing search keyword.
+    :return:
+    """
     url = BASE_URL + LIST_PATH
     req = Request(url, None, HEADERS)
 
@@ -28,14 +37,46 @@ def get_titles(search: str = None):
     return titles
 
 
-def create_folders(path: str, folder_name: str):
-    # TODO: Create folders for saving downloads
-    pass
+def create_dirs(title: str, name: str, path: str, date: str):
+    if not os.path.isdir(path):
+        raise InvalidPathException('`path` is not a directory or `path` does not exist.')
+
+    date_list = date.split('-')
+    year = date_list[0]
+    month = date_list[1]
+
+    create_path = os.path.join(path, name, year, month)
+    print(create_path)
+
+    if not os.path.isdir(create_path):
+        try:
+            os.makedirs(create_path)
+        except OSError as e:
+            print(e)
+            # TODO: Handle exception
+            return None
+
+    return create_path
 
 
-def get_img_src(comic: str, date: str = None):
-    url = BASE_URL + comic + '/' + date
-    # filename = comic + '-' + datetime.datetime.now().strftime("%Y-%m-%d") + '.gif'
+def save_title_for_date(title: str, path: str, date: str):
+    source = get_img_src(title, date.replace('-', '/'))
+    filename = '{}-{}.gif'.format(title, date)
+
+    try:
+        file_path = os.path.join(path, filename)
+        urlretrieve(source, file_path)  # Save file with `filename`
+    except ContentTooShortError as e:
+        print(e)
+        # TODO: Handle exception
+        return False
+
+    return True
+
+
+def get_img_src(title: str, date: str = None) -> str:
+    url = BASE_URL + '/' + title + '/' + date
+    print(url)
     req = Request(url, None, HEADERS)
 
     with urlopen(req) as response:
