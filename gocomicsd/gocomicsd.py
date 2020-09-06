@@ -1,5 +1,4 @@
 import datetime
-import time
 from pathlib import Path
 from typing import Optional
 
@@ -9,8 +8,8 @@ from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
 
-from gocomicsd.commons import INVALID_DATE_MESSAGE
-from gocomicsd.helpers import get_titles
+from gocomicsd.commons import INVALID_DATE_MESSAGE, FILENAME, TITLE_NOT_FOUND_MESSAGE
+from gocomicsd.helpers import get_titles, create_dirs, save_title_for_date
 from gocomicsd.utils import DateIterator
 
 console = Console()
@@ -31,11 +30,12 @@ def is_valid_date(date: str):
 def title_exists(title: str):
     title = title.lower()
 
-    # with Halo(text='Getting titles from gocomics.com', spinner='dots'):
-    #     titles_ = get_titles()
-    #
-    # if title not in titles_.keys():
-    #     raise typer.BadParameter(TITLE_NOT_FOUND_MESSAGE.format(title))
+    with Halo(text='Getting titles from gocomics.com', spinner='dots'):
+        titles_ = get_titles()
+
+    if title not in titles_.keys():
+        raise typer.BadParameter(TITLE_NOT_FOUND_MESSAGE.format(title))
+
     return title
 
 
@@ -92,10 +92,15 @@ def save(
     with Progress() as progress:
         task = progress.add_task('[blue]Downloading...[/blue]', total=days)
         for date in date_iterator:
-            progress.console.print(
-                'Downloading file {}-{}.gif'.format(title.lower(), datetime.datetime.strftime(date, '%Y-%m-%d')))
+            formatted_date = datetime.datetime.strftime(date, '%Y-%m-%d')
+            filename = FILENAME.format(title.lower(), formatted_date)
+
+            # TODO: Cache titles
+
+            download_path = create_dirs(title, title, str(path.absolute()), formatted_date)
+
+            if save_title_for_date(title, download_path, formatted_date):
+                progress.console.print('Downloaded file {}.'.format(filename))
+            else:
+                console.print('[red]Something went wrong trying to download [/red]')
             progress.update(task, advance=1)
-
-            # TODO: Download title
-
-            time.sleep(1)

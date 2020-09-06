@@ -5,7 +5,7 @@ from urllib.request import Request, urlopen, urlretrieve
 
 from bs4 import BeautifulSoup
 
-from gocomicsd.commons import BASE_URL, HEADERS, LIST_PATH
+from gocomicsd.commons import BASE_URL, HEADERS, LIST_PATH, FILENAME
 from gocomicsd.exceptions import InvalidPathException
 
 
@@ -46,7 +46,6 @@ def create_dirs(title: str, name: str, path: str, date: str):
     month = date_list[1]
 
     create_path = os.path.join(path, name, year, month)
-    print(create_path)
 
     if not os.path.isdir(create_path):
         try:
@@ -61,7 +60,7 @@ def create_dirs(title: str, name: str, path: str, date: str):
 
 def save_title_for_date(title: str, path: str, date: str):
     source = get_img_src(title, date.replace('-', '/'))
-    filename = '{}-{}.gif'.format(title, date)
+    filename = FILENAME.format(title, date)
 
     try:
         file_path = os.path.join(path, filename)
@@ -75,8 +74,7 @@ def save_title_for_date(title: str, path: str, date: str):
 
 
 def get_img_src(title: str, date: str = None) -> str:
-    url = BASE_URL + '/' + title + '/' + date
-    print(url)
+    url = '{}/{}/{}'.format(BASE_URL, title, date)
     req = Request(url, None, HEADERS)
 
     with urlopen(req) as response:

@@ -12,3 +12,4 @@ LIST_PATH = r'/comics/a-to-z'
 
 INVALID_DATE_MESSAGE = 'Dates not in format YYYY-MM-DD!'
 TITLE_NOT_FOUND_MESSAGE = 'Title `{}` not found!'
+FILENAME = '{}-{}.gif'
